@@ -14,27 +14,44 @@ namespace SportsResults.JJHH17
 
         public static async Task SendEmail(string content)
         {
-            var currentDate = DateTime.Now.ToString("dd-MM-yyyy");
-
-            var client = new SendGridClient(APIKey);
-            var msg = new SendGridMessage()
+            if (IsValidEmail(senderAddress) && IsValidEmail(recipientAddress))
             {
-                From = new EmailAddress(senderAddress, senderName),
-                Subject = $"Sports Results - {currentDate}",
-                PlainTextContent = content,
-            };
+                var currentDate = DateTime.Now.ToString("dd-MM-yyyy");
 
-            msg.AddTo(new EmailAddress(recipientAddress, recipientName));
+                var client = new SendGridClient(APIKey);
+                var msg = new SendGridMessage()
+                {
+                    From = new EmailAddress(senderAddress, senderName),
+                    Subject = $"Sports Results - {currentDate}",
+                    PlainTextContent = content,
+                };
 
-            try
-            {
-                var response = await client.SendEmailAsync(msg);
-                Console.WriteLine("Email sent");
+                msg.AddTo(new EmailAddress(recipientAddress, recipientName));
+
+                try
+                {
+                    var response = await client.SendEmailAsync(msg);
+                    Console.WriteLine("Email sent");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("An error occurred when sending the message: " + ex.Message);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine("An error occurred when sending the message: " + ex.Message);
+                Console.WriteLine("Invalid sender or recipient email address.");
             }
+        }
+
+        private static bool IsValidEmail(string email)
+        {
+            if (email.Contains("@") && email.Contains("."))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
