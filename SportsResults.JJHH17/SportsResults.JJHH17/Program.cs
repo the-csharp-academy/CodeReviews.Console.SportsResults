@@ -3,8 +3,9 @@ namespace SportsResults.JJHH17;
 
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
-        Console.WriteLine("Hello, World! Sports results");
+        string content = SiteScrape.GetInfo();
+        await Email.SendEmail(content);
     }
 }
