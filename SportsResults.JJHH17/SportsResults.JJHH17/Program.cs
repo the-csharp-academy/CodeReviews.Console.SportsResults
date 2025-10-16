@@ -21,7 +21,7 @@ class Program
 
 public class SportsResultsService : BackgroundService
 {
-    private static string TimeZoneId = ConfigurationManager.AppSettings["timeZoneId"] ?? "Europe/London";
+    private static string TimeZoneId = ConfigurationManager.AppSettings["TimeZoneId"] ?? "Europe/London";
 
     // Cron scheduled to run at 09:00 daily
     private static readonly CronExpression cron = CronExpression.Parse("0 9 * * *");
