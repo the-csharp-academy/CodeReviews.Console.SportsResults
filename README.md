@@ -1,6 +1,7 @@
 # Sports Results Application
 
 A C# / .NET program that emails the client recent NBA scores
+This will send an email on a daily cron schedule - it runs at 09:00 (BST / GMT) every day, and the timezone can be changed via the app.config file.
 
 ## Application Details
 
@@ -16,6 +17,7 @@ A C# / .NET program that emails the client recent NBA scores
 - HTML Agility Pack - Package for web scraping.
 - SendGrid / Twilio - For sending emails.
 - Configuration Manager - For storing credentials and email details.
+- Cronos - For scheduling the application to run at a specific time.
 
 ## Usage Instructions
 
@@ -24,7 +26,9 @@ A C# / .NET program that emails the client recent NBA scores
 3. Once done, open the app.config file and populate the API, sender and recipient details:
 <img width="150" height="70" alt="image" src="https://github.com/user-attachments/assets/baf413aa-7d94-4490-b880-26fe50e59740" />
 
-4. Run the application - an email will be received containing the results:
+4. You can also change the timezone of the application here too (the default is 09:00 BST / GMT, which is UK / London time).
+
+5. Run the application - an email will be received containing the results:
 <img width="220" height="350" alt="image" src="https://github.com/user-attachments/assets/d97a7aad-c13f-4e36-a7ed-31535914919b" />
 
 ## Notes and Considerations
