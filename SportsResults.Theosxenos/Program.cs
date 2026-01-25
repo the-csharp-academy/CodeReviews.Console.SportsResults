@@ -5,7 +5,7 @@ using SportsResultsNotifier.Controllers;
 using SportsResultsNotifier.Services;
 using SportsResultsNotifier.Utils;
 
-var builder = Host.CreateApplicationBuilder(args);
+HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
 builder.Configuration.AddUserSecrets<Program>();
 
@@ -16,6 +16,8 @@ builder.Services.AddScoped<ScraperService>();
 
 builder.Services.AddTransient<MainController>();
 
-var host = builder.Build();
+builder.Services.AddHostedService<SportsResultsWorker>();
 
-host.Services.GetRequiredService<MainController>().Start();
+IHost host = builder.Build();
+
+host.Run();

@@ -1,32 +1,22 @@
-using System.Net;
-using System.Net.Mail;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
+using MimeKit;
+using MimeKit.Text;
 using SportsResultsNotifier.Utils;
 
 namespace SportsResultsNotifier.Services;
 
 public class MailService(IOptions<MailServerSettings> options)
 {
-    private readonly MailServerSettings options = options.Value;
+    private readonly MailServerSettings _options = options.Value;
 
     public void SendMail(string body)
     {
-        ServicePointManager.ServerCertificateValidationCallback +=
-            (sender, certificate, chain, sslPolicyErrors) => true;
+        using MimeMessage mail = CreateMimeMessage(body);
 
-        var mail = new MailMessage(options.From, options.To)
-        {
-            IsBodyHtml = true,
-            Body = body,
-            Subject = options.Subject
-        };
-
-        SmtpClient smtpClient = new(options.Host)
-        {
-            Credentials = new NetworkCredential(options.UserName, options.Password),
-            Port = options.Port,
-            EnableSsl = options.SSL
-        };
+        using SmtpClient smtpClient = new();
+        smtpClient.Connect(_options.Host, _options.Port, _options.Ssl);
+        smtpClient.Authenticate(_options.UserName, _options.Password);
 
         try
         {
@@ -35,7 +25,25 @@ public class MailService(IOptions<MailServerSettings> options)
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Failed to send mail: " + ex.Message);
+            Console.WriteLine($"Failed to send mail: {ex.Message}");
         }
+        finally
+        {
+            smtpClient.Disconnect(true);
+        }
+    }
+
+    private MimeMessage CreateMimeMessage(string body)
+    {
+        var mimeMessage = new MimeMessage
+        {
+            Body = new TextPart(TextFormat.Html) { Text = body },
+            Subject = _options.Subject
+        };
+
+        mimeMessage.From.Add(MailboxAddress.Parse(_options.From));
+        mimeMessage.To.Add(MailboxAddress.Parse(_options.To));
+
+        return mimeMessage;
     }
 }
