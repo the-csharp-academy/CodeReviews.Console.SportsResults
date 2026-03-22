@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-SportsResultsNotifier.davetn657-8606c989-6c0b-49fd-86b6-c6ceec45f2a2</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
+  </ItemGroup>
+</Project>
