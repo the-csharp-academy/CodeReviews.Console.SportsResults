@@ -23,7 +23,7 @@ public static class EmailResources
             ReceiverName = "Marge Simpson",
             Host = "smtp.test.com",
             Password = "Te$tP@$$w0rd",
-            Port = 123,
+            Port = 123
         };
     }
 }
