@@ -1,0 +1,163 @@
+﻿@model NBANotifier.Models.DailyReportModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body style="background-color: #f4f9f4;">
+
+<h1> Daily NBA Report - @(Model.Date) </h1>
+
+<h2>Hi @(Model.Subscriber.Name), There
+    we're @(Model.NbaResults.Games.Count > 0 ? $"{Model.NbaResults.Games.Count} games today." : "no games today.")</h2>
+<br>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px;">
+    @foreach (var game in Model.NbaResults.Games)
+    {
+    <table style="width: 300px; border: 2px solid black; background-color: #F0F7F0;">
+        <thead>
+        <tr>
+            <th colspan="3"
+                style="border-bottom: 2px solid black; padding: 6px; text-align: center; font-weight: bolder;">@game.AwayTeam @
+                @ @game.HomeTeam</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td style="width: 50%; padding: 4px 6px 8px 6px; text-align: left;">@game.AwayTeam</td>
+            <td style="width: 10%; padding: 4px 6px 8px 6px; font-size: 20px; text-align: center;"> -</td>
+            <td style="width: 40%; padding: 4px 6px 8px 6px; text-align: right; font-weight: @(game.AwayScore >= game.HomeScore ? "bold" : "normal");">@game.AwayScore</td>
+        </tr>
+        <tr>
+            <td style="width: 50% ;padding: 4px 6px 8px 6px; text-align: left;">@game.HomeTeam</td>
+            <td style="width: 10%; padding: 4px 6px 8px 6px; font-size: 20px; text-align: center;"> -</td>
+            <td style="width: 40%; padding: 4px 6px 8px 6px; text-align: right; font-weight: @(game.HomeScore >= game.AwayScore ? "bold" : "normal");">@game.HomeScore</td>
+        </tr>
+        </tbody>
+    </table>
+    }
+</div>
+<br>
+<div style="display: flex; flex-wrap: wrap; gap: 16px;">
+    <table style="border: 2px solid black; background-color: #F0F7F0;">
+        <thead>
+        <tr>
+            <th style="border-bottom: 2px solid black; border-right: 2px #bbbaba; padding: 6px; text-align: center; font-weight: bold; color: #990000">
+                Eastern Conference
+            </th>
+            <th style="border-bottom: 2px solid black; border-right: 2px #d8d7d7; padding: 6px; text-align: center; font-weight: bold; color: #990000">
+                W
+            </th>
+            <th style="border-bottom: 2px solid black; border-right: 2px #d8d7d7; padding: 6px; text-align: center; font-weight: bold; color: #990000">
+                L
+            </th>
+            <th style="border-bottom: 2px solid black; border-right: 2px #d8d7d7; padding: 6px; text-align: center; font-weight: bold; color: #990000">
+                W/L%
+            </th>
+            <th style="border-bottom: 2px solid black; border-right: 2px #d8d7d7; padding: 6px; text-align: center; font-weight: bold; color: #990000">
+                GB
+            </th>
+            <th style="border-bottom: 2px solid black; border-right: 2px #d8d7d7; padding: 6px; text-align: center; font-weight: bold; color: #990000">
+                PPG
+            </th>
+            <th style="border-bottom: 2px solid black; padding: 6px; text-align: center; font-weight: bold; color: #990000">
+                OPPG
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var team in Model.NbaResults.EasternConference)
+        {
+        <tr>
+            <td style="padding: 6px; text-align: center; font-weight: bold;"> @team.Name</td>
+            <td style="padding: 6px; text-align: center; font-weight: bold;">@team.Wins</td>
+            <td style="padding: 6px; text-align: center; font-weight: bold;">@team.Losses</td>
+            <td style="padding: 6px; text-align: center; font-weight: bold;">@team.WinLossPercentage</td>
+            <td style="padding: 6px; text-align: center; font-weight: bold;">@team.GamesBack</td>
+            <td style="padding: 6px; text-align: center; font-weight: bold;">@team.PointsPerGame</td>
+            <td style="padding: 6px; text-align: center; font-weight: bold;">@team.PointsAllowedPerGame</td>
+        </tr>
+        }
+        </tbody>
+    </table>
+    <br>
+    <table style="border: 2px solid black; background-color: #F0F7F0;">
+        <thead>
+        <tr>
+            <th style="border-bottom: 2px solid black; border-right: 2px #bbbaba; padding: 6px; text-align: center; font-weight: bold; color: #990000">
+                Western Conference
+            </th>
+            <th style="border-bottom: 2px solid black; border-right: 2px #d8d7d7; padding: 6px; text-align: center; font-weight: bold; color: #990000">
+                W
+            </th>
+            <th style="border-bottom: 2px solid black; border-right: 2px #d8d7d7; padding: 6px; text-align: center; font-weight: bold; color: #990000">
+                L
+            </th>
+            <th style="border-bottom: 2px solid black; border-right: 2px #d8d7d7; padding: 6px; text-align: center; font-weight: bold; color: #990000">
+                W/L%
+            </th>
+            <th style="border-bottom: 2px solid black; border-right: 2px #d8d7d7; padding: 6px; text-align: center; font-weight: bold; color: #990000">
+                GB
+            </th>
+            <th style="border-bottom: 2px solid black; border-right: 2px #d8d7d7; padding: 6px; text-align: center; font-weight: bold; color: #990000">
+                PPG
+            </th>
+            <th style="border-bottom: 2px solid black; padding: 6px; text-align: center; font-weight: bold; color: #990000">
+                OPPG
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var team in Model.NbaResults.WesternConference)
+        {
+        <tr>
+            <td style="padding: 6px; text-align: center; font-weight: bold;"> @team.Name</td>
+            <td style="padding: 6px; text-align: center; font-weight: bold;">@team.Wins</td>
+            <td style="padding: 6px; text-align: center; font-weight: bold;">@team.Losses</td>
+            <td style="padding: 6px; text-align: center; font-weight: bold;">@team.WinLossPercentage</td>
+            <td style="padding: 6px; text-align: center; font-weight: bold;">@team.GamesBack</td>
+            <td style="padding: 6px; text-align: center; font-weight: bold;">@team.PointsPerGame</td>
+            <td style="padding: 6px; text-align: center; font-weight: bold;">@team.PointsAllowedPerGame</td>
+        </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@if (Model.Subscriber.SubscribeToWnbaReports == true)
+{
+<br>
+<hr class="styled-line">
+<h2> There
+    we're @(Model.WnbaResults.Games.Count > 0 ? $"{Model.WnbaResults.Games.Count} WNBA games today:" : "no WNBA games today.") </h2>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px;">
+    @foreach (var game in Model.WnbaResults.Games)
+    {
+    <table style="width: 300px; border: 2px solid black; background-color: #F0F7F0;">
+        <thead>
+        <tr>
+            <th colspan="3"
+                style="border-bottom: 2px solid black; padding: 6px; text-align: center; font-weight: bolder;">@game.AwayTeam @
+                @ @game.HomeTeam</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td style="width: 50%; padding: 4px 6px 8px 6px; text-align: left;">@game.AwayTeam</td>
+            <td style="width: 10%; padding: 4px 6px 8px 6px; font-size: 20px; text-align: center;"> -</td>
+            <td style="width: 40%; padding: 4px 6px 8px 6px; text-align: right; font-weight: @(game.AwayScore >= game.HomeScore ? "bold" : "normal");">@game.AwayScore</td>
+        </tr>
+        <tr>
+            <td style="width: 50% ;padding: 4px 6px 8px 6px; text-align: left;">@game.HomeTeam</td>
+            <td style="width: 10%; padding: 4px 6px 8px 6px; font-size: 20px; text-align: center;"> -</td>
+            <td style="width: 40%; padding: 4px 6px 8px 6px; text-align: right; font-weight: @(game.HomeScore >= game.AwayScore ? "bold" : "normal");">@game.HomeScore</td>
+        </tr>
+        </tbody>
+    </table>
+    }
+</div>
+}
+</body>
+</html>
