@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../SportsResultsNotifier.DeanoAbr.Tests/SportsResultsNotifier.DeanoAbr.Tests.csproj" />
+  <Project Path="SportsResultsNotifier.DeanoAbr.csproj" />
+</Solution>
