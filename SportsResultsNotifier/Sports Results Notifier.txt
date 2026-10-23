@@ -1,0 +1,227 @@
+##  Web Scraper and Email Automation
+
+##  Overview:
+
+A .NET Worker Service that scrapes quotes, authors and tags from https://quotes.toscrape.com/ using HtmlAgilityPack, builds them into an email body, and sends it every 24 hours. Emails are sent to a local Papercut SMTP server for testing.
+
+## Tech Stack:
+
+## C# / .NET Worker Service
+HtmlAgilityPack (HTML parsing and XPath)
+SmtpClient / MailMessage (sending email)
+Papercut SMTP (local email testing)
+
+## How to Run It:
+
+Install and start Papercut SMTP (it listens on port 25 in my setup).
+Open the solution and set the Worker project as the startup project (not the original console project).
+Run it. The first email is sent as soon as the service starts, then every 24 hours.
+Open Papercut to see the email.
+
+![Papercut showing email](images/papercut.png)
+
+## How It Works:
+
+This project scrapes quotes from a website and sends them by email.
+
+## In Order:
+
+HtmlWeb - Fetches the HTML web page from the internet.
+
+[ HtmlAgilityPack - Loads that HTML so it can be read by .NET.
+
+[ XPath - pinpoints and pulls out the exact data fields you want.
+
+[ SmtpClient ] - Emails the extracted data straight to recipient .
+
+[StringBuilder] - Acts as an accumulator of text that collects extracted data.
+
+[Worker Service] - Contains method calls of both methods needed to run the background task of sending email.
+
+
+## Building It:
+
+## HtmlAgilityPack - The HTML Parser
+
+When approaching the project I understood it would have many steps.
+The first step I took was to download the HtmlAgilityPack through visual studios nuget package manager, I understood that this pack would help me to scrape data from websites,It is a .NET library used to read and parse HTML documents, allowing us to extract specific data. Primarily, it allows us to locate specific elements on a webpage and extract the data contained within them. Once extracted, we can use this data in our application.
+
+var web = new HtmlWeb(); creates a new instance of the HtmlWeb class. This allows us to download a webpage so that we can query its HTML using XPath. HtmlDocument doc = web.Load("https://quotes.toscrape.com/"); This loads the webpage's HTML into an HtmlDocument object, allowing us to navigate and query its contents.
+
+
+## XPath - The Navigator
+
+XPath is a query language that allows us to navigate and select elements within an XML or HTML document.
+
+In my code, I wrote var quotes = doc.DocumentNode.SelectNodes("//div[@class='quote']");. This declares a new variable called quotes. The result returned by SelectNodes() is stored in this variable, allowing me to reference the selected elements later in the program.
+
+"//div[@class='quote']" is the XPath expression. This section of code means find all div elements with a class attribute equal to "quote", anywhere within the HTML document.
+
+## SmtpClient — Sending Emails
+
+SMTP (Simple Mail Transfer Protocol) is responsible for transferring emails to their recipients.
+
+SmtpClient is a C# class that allows the application to communicate with an SMTP server and send an email through it. In this project, it will be responsible for sending the email containing the scraped quote data to the specified recipient.
+
+
+## Choosing a Website:
+
+When attempting to scrape from the basketball reference website I could see that I was collecting a players stats from a row which is a HTML table. This meant that when referencing what node I would like returned the XPath would contain //tr meaning table rows. This would return all table rows for the player of my choosing.
+Unfortunately basketball reference is a website that does not allow scraping, when attempting to scrape I received a (403 Forbidden) error, this meant I had to find another site that did, the website I landed on was https://quotes.toscrape.com/.
+
+
+## Finding the Quotes:
+
+When using the inspect element feature I was able to find the exact id of the row by copying the XPath directly from the developers section. When scraping from the quote website I noticed that copying XPath only gave me the position of the quote I was copying also known as the position based address (/html/body/div/div[2]/div[1]/div[1]), as it didn't belong to a row I had to inspect the area the quote lived and find the class manually, as the class name was 'quote' I was able to put together the tag //div[@class='quote'] which returned the quotes with no issue.
+
+When extracting the quotes I had an issue where the data being returned appeared incorrect, strange symbols were being output. For example, the Marilyn Monroe quote printed `it&#39;s` instead of it's. I learned that these are HTML entities, which is how HTML writes certain characters such as apostrophes, as plain text. HtmlAgilityPack returns the raw text from the page, so the entity wasn’t converted automatically. I fixed this by wrapping the quote text in HtmlEntity.DeEntitize(), which converts the entities back into normal characters:
+
+string text = HtmlEntity.DeEntitize(quote.SelectSingleNode(".//span[@class='text']").InnerText.Trim());
+
+## Extracting the Author:
+
+As each quote belonged to an author I realised I would also need to scrape the name of each author. To do this I created a variable named author which used the quotes keyword to select a single node from the current quote. A single node was needed because each quote only has one author associated with it. The code .//small[@class='author'] uses XPath to collect the details of each author, starting from the current quote node(where the fullstop is).  Once the location has been gathered I place .InnerText.Trim(); just after it to extract the text and remove any unnecessary whitespace, leaving just the authors name.
+
+## Extracting the Tags:
+
+The final piece of data I needed to scrape was the tags associated with each quote, each quote had at least one tag that was assigned to it. The tag link on the site when pressed returned all quotes that belonged to that tag; For example if 'love' would return quotes about love, the life tag would return quotes about life and so on. 
+
+To return tags once again I created a variable 'tagNodes' This uses SelectNodes() to find all elements with the class tag within the current quote. .//a[@class='tag'] once again this uses XPath to collect the tags starting from where the fullstop begins. 
+
+## Storing and Formatting the Tags:
+
+When running the program, I noticed the tags were each listed on their own line instead of alongside the quote. I wanted each tag to be on the same line, separated by commas. To achieve this, I had to create a variable named tagList which is a instance of a new list of type string to hold the tags. After creating this, I needed to decide what I wanted to do with each tag in the list. I then created a foreach loop to iterate through each tag in the variable from before that holds the tags, tagNodes. Inside the loop, I use tagList (list of tags) to add each tag using the line tagList.Add(tag.InnerText.Trim());. This trims the text and stores a trimmed version of the tag's inner text.
+
+Once each tag was in a clean form, I could join the tags together. The line string tags = string.Join(", ", tagList); creates a variable named tags, which joins each tag in the tagList together, separated by a comma and a space. Once this was complete, I could finally write out the quote, the author and the tags using Console.WriteLine($"{text} - {author} [{tags}]");.
+
+## Preparing the Email Body with StringBuilder:
+
+Once I decided I was ok with the output, I had to decide how the data would be packed as an email. I used the StringBuilder class to create a new instance of a stringbuilder, this would be used for creating the email body. Using the AppendLine() function I was able to package the text, author and tag variables to package the data in the body of the email. The line stringBuilder.AppendLine($"{text} - {author} [{tags}]"); uses our variables to add the text to the StringBuilder which stores the data ready to add it to the email. After ensuring the data had been scraped correctly I was ready to package the data and send it as an email.
+
+## Sending a Test Email with Papercut:
+
+I first created a method called SendTestEmail() this method would establish a new instance of the MailMessage class as well as the SmtpClient class. The SmtpClient instance had to be initialised with the host of the server as well as papercuts port number, this ensures papercut receives the email, the code illustrates how this was done using var smtp = new SmtpClient("localhost", 25);. 
+
+Once the settings had been configured I needed to create a sender email address, a recipient email address, a subject and a body. As this was just test data I was sending locally to papercut the sender and the recipient data could be random, the subject and body were labelled "Test". The line of code used to send the email was smtp.Send(mail);. This uses the instance of SmtpClient, smtp, to send our instance of MailMessage, mail, to the recipient using the Simple Mail Transfer Protocol (SMTP). Running the program worked, and the email was received by Papercut without error.
+
+## Sending the Scraped Quotes:
+
+With Papercut now receiving my data I was ready to package the data scraped from the quotes website. Once again as the email was being sent locally the sender and recipient emails didn't need to be real. The subject of the email was "Scraped Quotes" to reflect what I was sending and the body of the email needed to be the quotes followed by the author and lastly the tags assigned to each quote. I used the line mail.Body = stringBuilder.ToString();, which takes the data added using stringBuilder.AppendLine($"{text} - {author} [{tags}]\n"); inside the foreach loop and converts the contents of the StringBuilder into a string. Once in string format, I can use the ToString() method to retrieve the stored data and assign it to the email body.
+
+## The method used to send the email was:
+
+static void SendEmail(StringBuilder stringBuilder)
+{
+    using var mail = new MailMessage();
+    using var smtp = new SmtpClient("localhost", 25);
+
+    mail.From = new MailAddress("sender@example.com");
+    mail.To.Add("recipient@example.com");
+    mail.Subject = "Scraped Quotes";
+    mail.Body = stringBuilder.ToString();
+
+    smtp.Send(mail);
+}
+
+SendEmail(stringBuilder); 
+
+## Refactoring into Scrape() and SendEmail():
+
+Once the scraped quotes were sent and received without issue I decided to do some refactoring. I moved the scraping operations inside of a method named Scrape(), This included loading the website, creating the StringBuilder, checking for null values and using the foreach loop to process each scraped quote. The Scrape() method is set to return a string, so the null check was changed from a blank return to return ""; if "quotes" is null. This returns an empty string instead of terminating the program. If the scraped data is found, the method returns the data stored in the StringBuilder as a string using return stringBuilder.ToString();. This satisfies the method's return type.
+
+At the top of the program, I stored the returned string in a variable named body. The returned string from Scrape() is assigned to this variable, allowing the scraped data to be passed into the SendEmail() method and used as the body of the email through mail.Body = body, instead of mail.Body = stringBuilder.ToString();. To use body, the SendEmail() method was adjusted to accept two parameters: one for the subject of the email and one for the body of the email.
+
+## Automating with a Worker Service:
+
+The next stage of the program was understanding how to automate the sending of emails at a set time everyday. This involved looking and reading up on Worker Service classes, BackgroundService ExecuteAsync and Task.Delay. I learned that a worker service class is a project template , worker services run continuously without human interaction.
+
+BackgroundService.ExecuteAsync() is used to define the background task that runs when the hosted service starts. In my case backgroundservice would be used to automate the work of the scraper and ExecuteAsync could be responsible for running the scraping and email sending process on a schedule after placing my methods calls inside it. For BackgroundService to run daily I would need to implement the logic that handles the scheduling, The project uses a fixed 24 hour delay, meaning the email would be sent 24 hours after the project was run. Task.Delay is used to pause the execution of an asynchronous method for a specified amount of time. For example Task.Delay(10000) creates a task that completes after 10,000 milliseconds which is only 10 seconds using await before the task call tells the method to wait for the task to complete before continuing. I switched the delay to Task.Delay(TimeSpan.FromHours(24)), this ensured an email was sent 24 hours from when the program was ran fulfilling the project requirement.
+
+With the knowledge in mind I was ready to create the worker class, at this point I understood that the worker class is for running background tasks and would need both methods inside of it in order to reference them inside ExecuteAsync(). I copied both the scrape() and SendEmail() methods to the worker class and changed the boilerplate code to call both methods.
+
+## First Version:
+
+protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+{
+    string body = Scrape();
+
+    if (!string.IsNullOrWhiteSpace(body))
+    {
+        SendEmail("Daily Quotes", body);
+        _logger.LogInformation("Email sent successfully.");
+    }
+    else
+    {
+        _logger.LogInformation("No quotes found. Email not sent.");
+    }
+
+    await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+}
+
+
+## The final ExecuteAsync:
+
+   protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+   {
+       while (!stoppingToken.IsCancellationRequested)
+       {
+           try
+           {
+               string body = Scrape();
+
+               if (!string.IsNullOrWhiteSpace(body))
+               {
+                   SendEmail("Daily Quotes", body);
+                   _logger.LogInformation("Email sent successfully.");
+               }
+               else
+               {
+                   _logger.LogInformation("No quotes found. Email not sent.");
+               }
+           }
+           catch (Exception ex)
+           {
+               {
+                   _logger.LogError(ex, "Run failed.");
+               }
+           }
+               await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
+       }
+
+
+In this final version everything sits inside a while loop that keeps running until the service is stopped. The scrape / send happen inside the try block, any exception is caught and logged, the loop then waits 24 hours before repeating. The delay is placed after the try/catch, so it runs whether the cycle succeeded or failed.
+
+
+In this first version, body is assigned the value returned by Scrape(). If body contains the scraped data, the SendEmail() method is called with “Daily Quotes” as the subject and body as the email body, and the logger records that the email was sent. If no data is found, the else block logs that the email was not sent because no quotes were found. The final line makes the worker wait 30 seconds, using Task.Delay() to pause execution. stoppingToken allows the delay to be cancelled when the application shuts down, and await lets the wait happen asynchronously. When I ran this, only one email was sent. The method scraped, sent, waited 30 seconds and then finished, because there was no loop to make it run again. To fix this I added a while loop.
+
+
+I made use of the CancellationToken using it in a while loop, while the CancellationToken hasn't been activated (stopped) the loop must continue running, this was made the condition for the loop to continue. I added try and catch exception handling methods to the calling of the scrape method in the case of errors like being unable to connect to Papercut or the address of the site changing, the exception is caught and logged instead of crashing the service. 
+
+
+## Problems I Hit and How I Fixed Them:
+
+I initially had the line await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken); line inside the catch loop which was causing emails to send out every few seconds. A catch block only runs when an exception happens, so the delay I expected would only happen when something failed, as the data was scraped without issue the debugger never entered the catch block and the delay never happened.
+
+## Understanding Program.cs and Worker:
+
+At first I was confused by the fact that a worker service had its own program.cs alongside my console project’s, and that I never referenced Worker anywhere. I assumed that some kind of dependency injection setup had to be telling the program where to go. After looking at the worker project’s Program.cs I noticed the line builder.Services.AddHostedService<Worker>(); this line registers Worker with the host. When host.Run starts, the host creates the worker and calls its ExecuteAsync itself so I never have to call it.
+
+## Testing with breakpoints:
+
+Seeing this helped me understand what the flow was, To test this I placed a breakpoint on the var builder = Host.CreateApplicationBuilder(args); line in the worker project’s Program.cs and the second breakpoint inside the first line of the ExecuteAsync method in the worker class. When running the program after this and tracing the call stack I could see that the debugger went to Program.cs first and then ExecuteAsync. This confirmed that program.cs is the entry point and the host runs the worker, not the other way round. My breakpoints didnt stop the program initially because the old console project was set as the startup project, only after switching to the new project did the breakpoints stop the program. This helped me to understand that the worker is a separate project, although that fact probably should've stuck when I had to install the HtmlAgilityPack all over again in the worker service.
+
+Continue vs Return:
+
+SelectNodes() returns null when it finds nothing, so a quote with no tags would crash the inner foreach with a NullReferenceException. I added a null check on tagNodes straight after selecting it, before anything uses it. At first I had the check at the bottom of the loop, which was too late, because the crash would happen before the program reached it. Inside the check I used continue instead of return. Continue skips only the current quote and moves on to the next one, while return would have terminated the whole method and stopped every remaining quote from being scraped.
+
+##  Limitations:
+
+Program must be running continuously for the email to be sent daily
+
+The site always shows the same quotes, so the daily email repeats 
+
+The 24 hour delay counts from the end of the previous run not from a fixed time of day
+
+The original scrape site Basketball Reference, returned 403 Forbidden, so the data source was changed
+
+Emails go to Papercut only, not a real inbox

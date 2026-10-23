@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36811.4
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportsResultsNotifier", "SportsResultsNotifier\SportsResultsNotifier.csproj", "{94B37434-B557-4EAD-B959-9AAB763E79C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkerService1", "WorkerService1\WorkerService1.csproj", "{DC41DD8F-B329-4194-A852-9C1BB680FFA7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{94B37434-B557-4EAD-B959-9AAB763E79C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94B37434-B557-4EAD-B959-9AAB763E79C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94B37434-B557-4EAD-B959-9AAB763E79C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94B37434-B557-4EAD-B959-9AAB763E79C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC41DD8F-B329-4194-A852-9C1BB680FFA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC41DD8F-B329-4194-A852-9C1BB680FFA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC41DD8F-B329-4194-A852-9C1BB680FFA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC41DD8F-B329-4194-A852-9C1BB680FFA7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8DF5E020-796B-4906-A085-FDEDF00DA5A6}
+	EndGlobalSection
+EndGlobal
